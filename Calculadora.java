@@ -10,14 +10,14 @@ import javax.sound.sampled.*;
 
 public class Calculadora extends JFrame {
 
-    // ── Estado ────────────────────────────────────────────────────────────────
+   
     private String expressao = "";
     private double memoria   = 0;
     private boolean modoEscuro = true;
     private boolean modoCientifico = false;
     private final List<String> historico = new ArrayList<>();
 
-    // ── Componentes principais ────────────────────────────────────────────────
+    
     private JLabel  labelExpressao;
     private JLabel  labelResultado;
     private JPanel  painelBotoes;
@@ -30,8 +30,7 @@ public class Calculadora extends JFrame {
     private JTextField campoConversor;
     private JLabel labelConversorResultado;
 
-    // ── Paletas ───────────────────────────────────────────────────────────────
-    // Escuro
+   
     private static final Color D_FUNDO      = new Color(15,  23,  42);
     private static final Color D_DISPLAY    = new Color(10,  16,  30);
     private static final Color D_BTN_NUM    = new Color(30,  41,  59);
@@ -41,7 +40,7 @@ public class Calculadora extends JFrame {
     private static final Color D_TEXTO      = Color.WHITE;
     private static final Color D_EXPR       = new Color(148,163,184);
 
-    // Claro
+   
     private static final Color L_FUNDO      = new Color(241,245,249);
     private static final Color L_DISPLAY    = new Color(255,255,255);
     private static final Color L_BTN_NUM    = new Color(255,255,255);
@@ -51,7 +50,6 @@ public class Calculadora extends JFrame {
     private static final Color L_TEXTO      = new Color(15,  23,  42);
     private static final Color L_EXPR       = new Color(100,116,139);
 
-    // ── Constantes de comando ─────────────────────────────────────────────────
     private static final String C_CLEAR  = "C";
     private static final String C_BACK   = "BACK";
     private static final String C_SQRT   = "√";
@@ -74,11 +72,11 @@ public class Calculadora extends JFrame {
     private static final String C_PARL   = "(";
     private static final String C_PARR   = ")";
 
-    // ── Parser ────────────────────────────────────────────────────────────────
+  
     private int    parserPos;
     private String parserExpr;
 
-    // =========================================================================
+   
     public Calculadora() {
         setTitle("Calculadora");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -93,14 +91,14 @@ public class Calculadora extends JFrame {
         setVisible(true);
     }
 
-    // ── Construção da UI ──────────────────────────────────────────────────────
+   
     private void construirUI() {
         setLayout(new BorderLayout(0, 0));
 
-        // === PAINEL ESQUERDO (calculadora principal) ==========================
+
         JPanel painelEsquerdo = new JPanel(new BorderLayout(0, 0));
 
-        // --- Display ----------------------------------------------------------
+        
         JPanel display = new JPanel(new BorderLayout());
         display.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
@@ -116,7 +114,6 @@ public class Calculadora extends JFrame {
         display.add(labelResultado, BorderLayout.CENTER);
         painelEsquerdo.add(display, BorderLayout.NORTH);
 
-        // --- Botões de memória e utilitários ----------------------------------
         JPanel painelUtil = new JPanel(new GridLayout(1, 6, 6, 0));
         painelUtil.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         String[][] util = {
@@ -129,7 +126,7 @@ public class Calculadora extends JFrame {
         }
         painelEsquerdo.add(painelUtil, BorderLayout.CENTER);
 
-        // --- Grade principal --------------------------------------------------
+ 
         painelBotoes = new JPanel(new GridLayout(5, 4, 8, 8));
         painelBotoes.setBorder(BorderFactory.createEmptyBorder(8, 10, 10, 10));
 
@@ -147,7 +144,7 @@ public class Calculadora extends JFrame {
         wrapBotoes.add(painelBotoes, BorderLayout.CENTER);
         painelEsquerdo.add(wrapBotoes, BorderLayout.SOUTH);
 
-        // === PAINEL CIENTÍFICO (oculto por padrão) ============================
+     
         painelCientifico = new JPanel(new GridLayout(5, 2, 8, 8));
         painelCientifico.setBorder(BorderFactory.createEmptyBorder(8, 4, 10, 10));
         painelCientifico.setVisible(false);
@@ -161,12 +158,12 @@ public class Calculadora extends JFrame {
         };
         for (String[] c : cientifico) painelCientifico.add(criarBotaoCientifico(c[0], c[1]));
 
-        // === PAINEL DIREITO (histórico + conversor) ===========================
+
         JPanel painelDireito = new JPanel(new BorderLayout(0, 8));
         painelDireito.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
         painelDireito.setPreferredSize(new Dimension(200, 0));
 
-        // Botão tema
+
         JButton btnTema = new JButton("☀ / ☾");
         btnTema.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         btnTema.setFocusPainted(false);
@@ -175,7 +172,7 @@ public class Calculadora extends JFrame {
         btnTema.addActionListener(e -> { modoEscuro = !modoEscuro; aplicarTema(); });
         painelDireito.add(btnTema, BorderLayout.NORTH);
 
-        // Histórico
+
         modeloHistorico = new DefaultListModel<>();
         listaHistorico  = new JList<>(modeloHistorico);
         listaHistorico.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -197,13 +194,12 @@ public class Calculadora extends JFrame {
         JScrollPane scroll = new JScrollPane(listaHistorico);
         scroll.setBorder(BorderFactory.createTitledBorder("Histórico"));
 
-        // Conversor
         painelConversor = construirConversor();
 
         painelDireito.add(scroll,          BorderLayout.CENTER);
         painelDireito.add(painelConversor, BorderLayout.SOUTH);
 
-        // === LAYOUT FINAL =====================================================
+        
         JPanel centro = new JPanel(new BorderLayout(0, 0));
         centro.add(painelCientifico, BorderLayout.WEST);
         centro.add(painelEsquerdo,   BorderLayout.CENTER);
@@ -212,7 +208,6 @@ public class Calculadora extends JFrame {
         add(painelDireito, BorderLayout.EAST);
     }
 
-    // ── Conversor de unidades ─────────────────────────────────────────────────
     private JPanel construirConversor() {
         JPanel p = new JPanel(new GridLayout(5, 1, 4, 4));
         p.setBorder(BorderFactory.createTitledBorder("Conversor"));
@@ -279,7 +274,7 @@ public class Calculadora extends JFrame {
         }
     }
 
-    // ── Fábrica de botões ─────────────────────────────────────────────────────
+
     private JButton criarBotao(String label, String cmd) {
         JButton b = new JButton(label);
         b.setActionCommand(cmd);
@@ -316,7 +311,7 @@ public class Calculadora extends JFrame {
         return b;
     }
 
-    // ── Tema ──────────────────────────────────────────────────────────────────
+   
     private void aplicarTema() {
         Color fundo   = modoEscuro ? D_FUNDO   : L_FUNDO;
         Color display = modoEscuro ? D_DISPLAY : L_DISPLAY;
@@ -380,7 +375,7 @@ public class Calculadora extends JFrame {
         return "/ * + - C BACK √ % = MC MR M+ M- SCI ( ) sin cos tan log ln x² xⁿ π e |x|".contains(cmd);
     }
 
-    // ── Teclado ───────────────────────────────────────────────────────────────
+   
     private void configurarTeclado() {
         addKeyListener(new KeyAdapter() {
             @Override public void keyPressed(KeyEvent e) {
@@ -401,7 +396,7 @@ public class Calculadora extends JFrame {
         requestFocusInWindow();
     }
 
-    // ── Processamento de comandos ─────────────────────────────────────────────
+
     private void processarComando(String cmd) {
         switch (cmd) {
             case C_CLEAR:
@@ -499,7 +494,6 @@ public class Calculadora extends JFrame {
         }
     }
 
-    // ── Cálculo ───────────────────────────────────────────────────────────────
     private void calcular() {
         if (expressao.isEmpty()) return;
         String exprParaCalc = expressao;
@@ -556,7 +550,6 @@ public class Calculadora extends JFrame {
         }
     }
 
-    // ── Funções científicas ───────────────────────────────────────────────────
     private String aplicarFunc(String fn) {
         int ini = ultimoNumeroInicio(expressao);
         String pre = expressao.substring(0, ini);
@@ -678,7 +671,6 @@ public class Calculadora extends JFrame {
         return Double.parseDouble(parserExpr.substring(ini, parserPos));
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
     private boolean terminaEmOp() {
         if (expressao.isEmpty()) return false;
         char last = expressao.charAt(expressao.length() - 1);
@@ -724,7 +716,7 @@ public class Calculadora extends JFrame {
         } catch (Exception ignored) {}
     }
 
-    // ── Listener de hover reutilizável ────────────────────────────────────────
+
     private static class HoverListener extends MouseAdapter {
         private final JButton btn;
         private final Color normal, hover;
@@ -733,7 +725,7 @@ public class Calculadora extends JFrame {
         @Override public void mouseExited (MouseEvent e) { btn.setBackground(normal); }
     }
 
-    // ── Renderer do histórico ─────────────────────────────────────────────────
+
     private class HistoricoCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -751,7 +743,6 @@ public class Calculadora extends JFrame {
         }
     }
 
-    // ── Main ──────────────────────────────────────────────────────────────────
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
